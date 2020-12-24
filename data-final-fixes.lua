@@ -2,9 +2,20 @@
 -- -------- 调整物品堆叠 --------------------------------------------------------------------------
 -- ------------------------------------------------------------------------------------------------
 
+local function GetCount( rail )
+	if rail then
+		local placeBy = rail.placeable_by or {}
+		return placeBy.count or 1
+	else return 1 end
+end
+
 for itemType , itemTypeName in pairs( SITypes.stackableItem ) do
 	for name , item in pairs( SIGen.GetList( itemTypeName ) ) do
-		item.stack_size = 1
+		if itemTypeName == SITypes.item.railPlanner then
+			local railStraight = GetCount( SIGen.GetData( SITypes.entity.railStraight , item.straight_rail ) )
+			local railCurved = GetCount( SIGen.GetData( SITypes.entity.railCurved , item.curved_rail ) )
+			item.stack_size = math.max( math.max( railStraight , railCurved ) , 1 )
+		else item.stack_size = 1 end
 	end
 end
 
